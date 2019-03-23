@@ -14,6 +14,5 @@ extractHeadArg = do
     return $ head args
 
 main = do 
-    args <- getArgs
     first <- extractHeadArg
     sayHello first
