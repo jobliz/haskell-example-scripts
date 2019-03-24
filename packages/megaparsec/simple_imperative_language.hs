@@ -11,6 +11,14 @@ Run with runghc, type
     var := 42
 Hit enter, and then control + D. It should say
     Assign "var" (IntConst 42)
+
+Slightly larger example, arithmetic:
+  x := 6;
+  y := 4;
+  z := x + y
+
+It prints out:
+  Seq [Assign "x" (IntConst 6),Assign "y" (IntConst 4),Assign "z" (ABinary Add (Var "x") (Var "y"))]
 -}
 
 module Main (main) where
