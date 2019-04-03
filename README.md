@@ -19,8 +19,6 @@ VS Code IDE setup:
 
 * "Haskell Language Server" in VS Code Extensions Marketplace
 * [Github Repo of Extension](https://github.com/alanz/vscode-hie-server)
-TODO
-* 
 
 Online books
 ------------
