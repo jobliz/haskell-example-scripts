@@ -37,7 +37,7 @@ parseMessage s = do
     let elements = splitOn " " s -- first item after splitting by spaces (message type)
     -- let key = (intercalate "" (head elements))   does not work
     let key = elements !! 0
-    case key of 
+    case key of -- todo: understand types, case does not work with single quotes when I expected it to
         "I" -> parseInformationMessage s
         "W" -> parseWarningMessage s
         "E" -> parseErrorMessage s
