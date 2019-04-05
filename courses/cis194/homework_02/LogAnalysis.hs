@@ -4,6 +4,7 @@
 
 module LogAnalysis where
 
+import Data.Typeable -- typeOf
 import System.Environment -- getArgs
 import Log
 import Data.List.Split -- splitOn, with cabal install split
@@ -43,8 +44,22 @@ parseMessage s = do
         "E" -> parseErrorMessage s
         _  -> Unknown s
 
+-- Doing smply "content <- readFile path" with a :: String -> [LogMessage] signature produces
+--      Couldn't match type ‘IO’ with ‘[]’
+-- because
+-- readFile is an IO operation and cannot be used if the function's
+-- output type is not IO(). You've gotta read it outside of this function
+-- and then feed it here.
+parseMessageFile :: String -> [LogMessage]
+parseMessageFile content = do
+    map parseMessage (lines content)
+    
+
 main = do
     args <- getArgs
-    content <- readFile (args !! 0) -- takes the first element (at position 0)
-    let messages = map parseMessage (lines content)
+    let path = (args !! 0)
+    content <- readFile path -- takes the first element (at position 0)
+    let notright = parseMessage "This is not in the right format"
+    let messages = parseMessageFile content
+    print notright
     mapM_ print messages
