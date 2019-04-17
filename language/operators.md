@@ -28,9 +28,30 @@ Where `fbStringRep` and `fizzBuzz` would be simple functions that receive only o
 The dot operator
 ----------------
 
-[Link1](https://stackoverflow.com/questions/940382/what-is-the-difference-between-dot-and-dollar-sign)
+While the `.` operator [can be used to avoid using parentheses](https://stackoverflow.com/questions/940382/what-is-the-difference-between-dot-and-dollar-sign), that's a very limited view of it. As expressed on one of the answers of the StackOverflow question:
 
-The `.` operator is the "function combinator operator. TODO: EXPLAIN
+> The primary purpose of the `.` operator is not to avoid parentheses, but to chain functions. It lets you tie the output of whatever appears on the right to the input of whatever appears on the left. This usually also results in fewer parentheses, but works differently.
+
+So, the dot `.` operator is the function combinator operator. The following three lines are equivalent, the last using the `$` operator to avoid all use of parentheses.
+
+```
+putStrLn (show (1 + 1))
+(putStrLn . show) (1 + 1)
+putStrLn . show $ 1 + 1
+```
+
+Keep in mind the type signatures:
+
+* `putStrLn :: String -> IO ()`
+* `show :: Show a => a -> String`
+
+At this point it would also be convenient to reflect on the type signatures of both `$` and `.` to compare them:
+
+*  `($) :: (a -> b) -> a -> b`
+*  `(.) :: (b -> c) -> (a -> b) -> a -> c`
+
+Here I see that `$` is much simpler to understand, whereas `.` is a bit more involved. `$` seems to reverse parameters, but this would benefit from a more detailed explaination. I'm not sure I can verbalize what `.` does right now (TODO)
+
 
 Monad-related operators
 -----------------------
