@@ -47,10 +47,19 @@ TODO: Think this carefully, explain achieved progress.
 * Parsing a simple mathematical language with parser combinators
 * Parsing a simple imperative language with parser combinators
 
+General introductory posts
+--------------------------
+
+* [What I Wish I knew When Learning Haskell](
+http://dev.stephendiehl.com/hask/)
+
+
 Online books
 ------------
 
 * [Real World Haskell](http://book.realworldhaskell.org/read/)
+* [Write Yourself a Scheme in 48 Hours](https://en.wikibooks.org/wiki/Write_Yourself_a_Scheme_in_48_Hours)
+* [Learn You a Haskell for Great Good!](http://learnyouahaskell.com/chapters)
 
 Reddit links
 ------------
