@@ -12,7 +12,7 @@ Some links that would be convenient to read before this:
 Introduction
 ------------
 
-After reading many Haskell tutorials and tripping over so many strange-looking operators, I deciced to try and do a file where I recorded my thought process as I learned about those operators and started to use them. While this file is intended so that I can explain operators to myself later because I'm prone to forgetting things (and perhaps later to someone else, with a better edited redaction posted somewhere else), there are principles that I should keep in mind before thinking about operators. 
+After reading many Haskell tutorials and tripping over so many strange-looking operators, I deciced to try and do a file where I recorded my thought process as I learned about those operators and started to use them. While this file is intended so that I can explain operators to myself later because I'm prone to forgetting things (and perhaps later to someone else, with a better edited readaction posted somewhere else), there are principles that I should keep in mind before thinking about operators. 
 
 From the aforementioned tutorials I got (without much learning structure or discipline) to a point where I wanted to play around with the `>>=` operator because it made command line argument reading easier and I do like working with the command line... but it turns out that the `>>=` operator is related to monads, which are themselves better understood if other Haskell features are understood first.
 
@@ -22,34 +22,39 @@ On a chat I was told that:
 
 So the learning path would be `Functor` -> `Applicative` -> `Monad`, and learning `Functor` would bring insight into the dot operator, for example (an insight I don't have right now).
 
-DO LINKS
-Warning on analogies: Haskellers recommend against doing analogies comparing Haskell features with other programming languages or any other kind of analogies because it leads to false certainties. However, I will still use analogies, for two reasons: I first imagined them and they motivated me, no matter how inexact, and so they're part of a path that starts from flawed understanding. Also, I hope others can get a similar 'aha' moment while being wary of a sense of understanding that could be wrong. We should detach ourselves from the idea that analogies will give us complete or even a little-yet-accurate understanding and treat them instead as landmarks in our own understanding.
+A warning on analogies: Haskellers recommend against doing analogies comparing Haskell features with other programming languages or any other kind of entities because they lead to false certainties, [especially when it comes to monads](http://dev.stephendiehl.com/hask/#monadic-myths). This seems to be wise advice I will certainly revisit after I've learned more. However, I will still use analogies in this text. They come naturally to me and I guess most people when first learning something, even if they're flawed. The purpose of this document is to trace the path from flawed understanding towards each improvement, no matter how messy it is, so that I can remember the mindset I had when first learning Haskell and thus trace back my steps years or decades from today. So, for this purpose and for this text I think we should detach ourselves from the idea that analogies will give us complete or even a little-yet-accurate understanding and treat them instead as landmarks in our own understanding. We still get the little dopamine-filled "aha" moment, but we also remain wary of it and willing to dissect it as necessary.
 
 Reading type signatures
 -----------------------
 
 TODO: Put everything related to how to read type signatures here.
 
-Preamble to Functor
--------------------
+Preamble to Functors
+--------------------
 
-I don't rememer where I read it first, but I'm fairly certain that I once read *somewhere* that functors in Haskell "would be named *Mappables* in other programming languages", that is, that *the map function can be used on whatever is a Functor* or something to that effect. The [Haskell wiki](https://wiki.haskell.org/Functor) seems to agree to a certain extent, but of course it also mentions category theory, of which I currently understand nothing:
+I don't rememer where I read it first, but I'm fairly certain that I once read *somewhere* that functors in Haskell "would be named *Mappables* in other programming languages", that is, that *a functor is something the map function can be used on*, or something to that effect. I've already used the `map` function in Python and Javascript, so my starting idea of it comes from them. The [Haskell wiki](https://wiki.haskell.org/Functor) seems to agree to a certain extent with the "Mappable" idea:
 
 > The Functor typeclass represents the mathematical functor: a mapping between categories in the context of category theory. In practice a functor represents a type that can be mapped over. 
 
-Functors, I also gather from tutorials and comments I've received on chats, are closely related to the `fmap` function in Haskell. The first thing that comes to my mind at this moment is "would `fmap` differ from the `map` function I've used before in, say, Python, and if so, how?"
+ But *of course* it also mentions category theory, of which I currently understand little to nothing (even if I hope to someday get it). For the time being, there's also [the definition in the Typeclassopedia](https://wiki.haskell.org/Typeclassopedia#Functor):
 
-Before looking at type signatures [this SO question and it's answers](https://stackoverflow.com/questions/6824255/whats-the-point-of-map-in-haskell-when-there-is-fmap) caught my attention, because there *is* a `map` function in Haskell and it's behavior does differ from `fmap`. This is the kind of detail that long-time users know and some newcomers like me prefer to know as early as possible, even if some experts would think that mentioning it "would confuse newbies". Knowing the history, anecdotes and customs of a programming language is, at least to me, an integral part to knowing such language, so it doesn't distract nor diminish my motivation.
+>[The Functor class](https://hackage.haskell.org/package/base/docs/Prelude.html#t:Functor) is the most basic and ubiquitous type class in the Haskell libraries. A simple intuition is that a Functor represents a “container” of some sort, along with the ability to apply a function uniformly to every element in the container. For example, a list is a container of elements, and we can apply a function to every element of a list, using `map`.
+
+That's a bit more understandable for me. Functors, I also gather from tutorials and comments I've received on chats, are closely related to the `fmap` function in Haskell. The first thing that comes to my mind at this precise moment is: "Why `fmap`? Isn't there a `map` function in Haskell, or is it just a naming thing? If both functions exist, would `fmap` differ from the `map` function I've used before in, say, Python, and if so, how?"
+
+It turns out those were good questions to ask myself (even before looking at types!), because  [this StackOverflow link and it's answers](https://stackoverflow.com/questions/6824255/whats-the-point-of-map-in-haskell-when-there-is-fmap) unearth something quite interesting about Haskell: There is both a `map` function and a `fmap` function in Haskell and they *do* behave differently. 
 
 Quoting from the link:
 
-> ... the type of map was generalized to cover Functor in Haskell 1.3. I.e., in Haskell 1.3 `fmap` was called `map`. This change was then reverted in Haskell 1.4 and `fmap` was introduced. The reason for this change was pedagogical; when teaching Haskell to beginners the very general type of `map` made error messages more difficult to understand. In my opinion this wasn't the right way to solve the problem. *Haskell 98 is seen as a step backwards by some Haskellers (including me), previous versions having defined a more abstract and consistent library. Oh well.*
+> ... the type of `map` was generalized to cover `Functor` in Haskell 1.3. I.e., in Haskell 1.3 `fmap` was called `map`. This change was then reverted in Haskell 1.4 and `fmap` was introduced. The reason for this change was pedagogical; when teaching Haskell to beginners the very general type of `map` made error messages more difficult to understand. In my opinion this wasn't the right way to solve the problem. *Haskell 98 is seen as a step backwards by some Haskellers (including me), previous versions having defined a more abstract and consistent library. Oh well.*
 
 There's also a comment in favor of the change, if in a nuanced position:
 
-> The map and fmap has been around for a long time - it was reheated on the Haskell-prime mailing list in August 2006 - haskell.org/pipermail/haskell-prime/2006-August/thread.html. As a counterpoint, I prefer the status quo. To me, it seems valuable that there's a subset of Haskell that corresponds roughly to Miranda. In the UK, Miranda was used as a teaching language for maths students not just computer science students. If that niche isn't already lost to a non-functional language (e.g. Mathematica) I don't see Haskell with a unified map filling it
+> The `map` and `fmap` has been around for a long time - it was reheated on the Haskell-prime mailing list in August 2006 - haskell.org/pipermail/haskell-prime/2006-August/thread.html. As a counterpoint, I prefer the status quo. To me, it seems valuable that there's a subset of Haskell that corresponds roughly to Miranda. In the UK, Miranda was used as a teaching language for maths students not just computer science students. If that niche isn't already lost to a non-functional language (e.g. Mathematica) I don't see Haskell with a unified `map` filling it
 
-So, in short, `map` and `fmap` are similar yet different. Let's take a look at the type signatures:
+This is the kind of detail that newcomers to Haskell like me prefer to know as early as possible, even if some experts would think that mentioning it "would confuse newbies". Knowing the history and anecdotes of a programming language is, at least to me, an integral part to knowing such language, so it doesn't distract nor diminish my motivation. Also, I'm not a total newbie. I've programmed before. I've endured language changes across versions of Python (2 to 3), PHP (the before-after split on version 7) and some in Javascript (if albeit less). Maybe that's why watching Haskell changing across versions and people having different opinions about it (that is, showing the human side of a mathematically-inspired language) motivates *me* more than, say, the childlish illustrations and *blank-slate* assumptions of some introductions to Haskell. Your mileage may vary, of course, and I'm not disparaging those introductions (I've learned from them!), just annotating a thought-stream.
+
+So, because of *reasons*, `map` and `fmap` are similar yet different in Haskell. Let's take a look at the type signatures now:
 
 * ```map :: (a -> b) -> [a] -> [b]```
 * ```fmap :: Functor f => (a -> b) -> f a -> f b```
@@ -72,23 +77,56 @@ class Functor (f :: * -> *) where
   -- Defined in ‘GHC.Base’
 ```
 
-We can see that `map` is a normal function and `fmap` *belongs* to a class `Functor`, like a method would in an object-oriented language (take this analogy with a grain of salt, as usual). The explaination of this difference in the SO answer goes as follows:
+We can see that `map` is a normal function and `fmap` *belongs* to a class `Functor`, like a method would to a class in an object-oriented language (take this analogy with several grains of salt, as usual). The explaination of this difference in the SO answer goes as follows:
 
-> `fmap` is defined as one of the functions whose implementations must be provided by those data types which wish to belong to the Functor type class. That means that there can be more than one data types, not only the "list of values" data type, able to provide an implementation for the fmap function. That makes fmap applicable to a much larger set of data types: the functors indeed!
+> `fmap` is defined as one of the functions whose implementations must be provided by those data types which wish to belong to the `Functor` type class. That means that there can be more than one data types, not only the "list of values" data type, able to provide an implementation for the fmap function. That makes `fmap` applicable to a much larger set of data types: the functors indeed!
 
 So I think I finally grasped something: `fmap` can work on things that aren't necessarily lists *and* on lists, whereas `map` can only work with lists. This opens a new question: *How could another data structure that is not a list be mapped like with `map`-like behavior?* 
 
-My initial guess goes into trees, whose structure can't be traversed with a `map` implementation that's dependent on list-specific pattern matching, and I think that answers the question for at least one case.
+My initial guess goes into trees, whose structure *can* be traversed recursively, just not with a `map` implementation that's dependent on list-specific pattern matching, and I think that answers the question for at least one case.
 
-Don't fret if you still don't know what pattern matching is, the important bit of information here is that the `map` implementation assumes that it will work on a  list, whereas `fmap` can work on anything that belongs to the class `Functor`. In other words: The `map` function in Haskell is a *very list-specific* implementation of the conceptual/mathematical map operation, whose high theory I guess can be used on many different kinds of structures. If so (I should get this conclusion checked by someone with more experience), then the `fmap` Haskell implementation is closer to the conceptual definition of map than the implementation of `map`, despite `map` being much easier to teach and reason about.
+Don't fret if you still don't know what pattern matching is, the important bit of information here is that Haskell's `map` implementation assumes that it will work on a  list, whereas `fmap` can work on anything that belongs to the class `Functor`. In other words: The `map` function in Haskell is a *very list-specific* implementation of the conceptual/mathematical map operation, whereas `fmap` stands closer to the high theory and so it can be used on many different kinds of structures.
 
 Using functors
 --------------
 
+Let's get to the code. From [this post](https://dkalemis.wordpress.com/2014/02/11/examples-of-functors-in-haskell/) we can get ourselves some minimal, runnable Haskell that defines and uses a functor of our own:
+
+```haskell
+module Main where
+ 
+data MyFunctor a = MySomething a deriving (Show)
+ 
+instance Functor MyFunctor where
+   fmap f (MySomething x) = MySomething (f x)
+ 
+main :: IO ()
+main  =
+   do
+      putStrLn "Program begins."
+ 
+      let thing1 = MySomething 45
+      print thing1
+      print (fmap (*2) thing1)
+      print (fmap (+1) thing1)
+      print (fmap (:[]) thing1)
+      print (fmap (\x -> 2*x+1:[]) thing1)
+      print thing1
+ 
+      putStrLn "Program ends."
+```
+
+It runs, so it's ok, I guess, but I don't understand some parts of it. What I think I get is that `MyFunctor` seems to be something that holds a type `a` and apparently does nothing else but sort of "wrap" or "contain" around it and then allow `fmap` to run on it. The `instance` keyword is new to me and the `where` statement has confused me for a while (and still does).
+
+TODO: Continue.
+
+Applicatives
+------------
+
 TODO
 
-Applicative
------------
+Monads
+------
 
 TODO
 
