@@ -63,14 +63,14 @@ As a newcomer I do think that `map` is very easy to understand, and I'd agree th
 
 But we're learning Haskell, so we have to invest some attention in understanding why `fmap` exists and why it involves `Functor`. Now that we saw the type signatures, let's have an overview of the code. From [another answer in the same SO link as before](https://stackoverflow.com/a/45289276/9930918) we can see that `map` is [implemented in a two-line recursive function in the Haskell codebase](http://hackage.haskell.org/package/base-4.10.0.0/docs/src/GHC.Base.html#map):
 
-```
+```haskell
 map _ []     = []
 map f (x:xs) = f x : map f xs
 ```
 
 Whereas `fmap` is a bit more complicated (taken from `:info fmap` in `ghci`):
 
-```
+```haskell
 class Functor (f :: * -> *) where
   fmap :: (a -> b) -> f a -> f b
   ...
@@ -155,7 +155,7 @@ While the `.` operator [can be used to avoid using parentheses](https://stackove
 
 So, the dot `.` operator is the function combinator operator. The following three lines are equivalent, the last using the `$` operator to avoid all use of parentheses.
 
-```
+```haskell
 putStrLn (show (1 + 1))
 (putStrLn . show) (1 + 1)
 putStrLn . show $ 1 + 1
@@ -190,7 +190,7 @@ res <- foo arg1 arg2 bar res
 
 Here comes a very relevant section of [What I Wish I Knew When Learning Haskell](http://dev.stephendiehl.com/hask/#eightfold-path-to-monad-satori) to save the day (and also confirmating that the intention behind the title works wonders!), indicating that these three blocks are equivalent:
 
-```
+```haskell
 do
   a <- f           -- f, g, and h are bound to the names a,
   b <- g           -- b, and c. These names are then passed
@@ -218,7 +218,7 @@ Trying to bring this situation into the "real world" (which seems to be a rather
 My first and very naive idea was that these two lines processing command line arguments would 
 be equivalent:
 
-```
+```haskell
 args <- getArgs
 getArgs >>= args
 ```
@@ -228,7 +228,7 @@ But they aren't, and so the code fails. So, since we have no idea what we're doi
 https://www.schoolofhaskell.com/school/to-infinity-and-beyond/pick-of-the-week/Simple%20examples)
 and running it from a file we can see that the following lines of code are valid Haskell:
 
-```
+```haskell
 import System.Environment
 
 main = do
@@ -284,7 +284,7 @@ Now I can sort of imagine that `Monad` and `Show` would be classes/typeclasses (
 
 I think I've got a general idea of what's happening in the five type signatures now, so let's try doing something naive again that I actually attempted to do before writing these last paragraphs. This code will fail:
 
-```
+```haskell
 import System.Environment
 
 main = do
