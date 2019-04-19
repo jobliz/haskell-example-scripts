@@ -4,30 +4,99 @@ Haskell operators, coarsely explained
 *This is a rough draft I'm writing iteratively as I try to
 understand Haskell operators. I give no guarantee of exactness, this is not (as of yet) something intended for other people. My main objetive here is to be able to remember my state of mind from back when I knew almost nothing (the begginer's mind, so to speak), as it seems that experienced Haskellers are prone to forget how someone new to the language thinks. Here every naive thought and sarcastic quip I have gets recorded, examined and left as it is.*
 
-Some links that would be convenient to read before this:
-
-* [Learning Haskell by Type](https://www.holger-peters.de/haskell-by-types.html)
-* [Stack Overflow: What is the purpose of wrapped values in Haskell](https://softwareengineering.stackexchange.com/questions/303472/what-is-the-purpose-of-wrapped-values-in-haskell)
-
 Introduction
 ------------
 
-After reading many Haskell tutorials and tripping over so many strange-looking operators, I deciced to try and do a file where I recorded my thought process as I learned about those operators and started to use them. While this file is intended so that I can explain operators to myself later because I'm prone to forgetting things (and perhaps later to someone else, with a better edited readaction posted somewhere else), there are principles that I should keep in mind before thinking about operators. 
+After reading many Haskell tutorials and tripping over so many strange-looking operators, I deciced to try and do a file where I recorded my thought process as I learned about those operators and started to use them. This file is intended so that I can explain Haskell and it's operators to myself later because I'm prone to forgetting things, and perhaps later to someone else, with a better edited redaction posted somewhere else.
 
-From the aforementioned tutorials I got (without much learning structure or discipline) to a point where I wanted to play around with the `>>=` operator because it made command line argument reading easier and I do like working with the command line... but it turns out that the `>>=` operator is related to monads, which are themselves better understood if other Haskell features are understood first.
+From helpful guidance from others I got that the correct path to grasp Haskell would be to understand `Functor` first (which would then shed some light into how Haskell uses the dot `.` in an unique way, for example), then `Applicative` and then later `Monad`. Trying to do it in another order or by ignoring them seems to be the cause of much confusion to others as well as me, so I will follow this advice. This document, however, also focuses in the the thought-stream prose that I think leads to having the groundwork that is necessary to understand them.
 
-On a chat I was told that:
+The start of such groundwork would be (at least for me) some apparently random thoughts on the language:
 
-> `>>=` can be understood as building on `<$>`, aka `fmap :: Functor f => (a -> b) -> f a -> fb`, which you should really understand before attempting to learn about monads.
+**First**, a warning and personal caveat on analogies: Haskellers recommend against doing analogies comparing Haskell features with other programming languages or any other kind of entities, because they often lead to false certainties, [especially when it comes to monads](http://dev.stephendiehl.com/hask/#monadic-myths). This seems to be wise advice I will certainly revisit after I've learned more. However, I will still use analogies in this text. They come naturally to me and I guess most people when first learning something, even if they're flawed. The purpose of this document is to trace the path from flawed understanding towards each improvement, no matter how messy it is, so that I can remember the mindset I had when first learning Haskell and thus trace back my steps years or decades from today. 
 
-So the learning path would be `Functor` -> `Applicative` -> `Monad`, and learning `Functor` would bring insight into the dot operator, for example (an insight I don't have right now).
+So, for the previously stated learning purposes I think we should detach ourselves from the idea that analogies will give us complete or even a little-yet-accurate understanding and treat them instead as landmarks in our own understanding. We still get the little dopamine-filled "aha" moment, but we also remain wary of it and willing to dissect it as necessary. Also, we get to remember our previous analogies as we teach others how we improved on them as they inevitably start having their own more-or-less accurate ideas about the language.
 
-A warning on analogies: Haskellers recommend against doing analogies comparing Haskell features with other programming languages or any other kind of entities because they lead to false certainties, [especially when it comes to monads](http://dev.stephendiehl.com/hask/#monadic-myths). This seems to be wise advice I will certainly revisit after I've learned more. However, I will still use analogies in this text. They come naturally to me and I guess most people when first learning something, even if they're flawed. The purpose of this document is to trace the path from flawed understanding towards each improvement, no matter how messy it is, so that I can remember the mindset I had when first learning Haskell and thus trace back my steps years or decades from today. So, for this purpose and for this text I think we should detach ourselves from the idea that analogies will give us complete or even a little-yet-accurate understanding and treat them instead as landmarks in our own understanding. We still get the little dopamine-filled "aha" moment, but we also remain wary of it and willing to dissect it as necessary.
+**Second**, on function composition: From a not very detailed bird's view of the language, idiomatic Haskell seems to favor function composition a lot, that is, creating complex functions by chaining together simpler functions in different ways and shifting orders. In fact, many of the seemingly strange operators that abound in Haskell are intended to allow or ease this kind function composition, despite how hard to the eye they might seem to the untrained eye (mine certainly would fit that description as of yet!). My skeptic, speculative guess on this, however, would be that Haskell does suffer from a bit of the Perl tradition of condensing stuff so much it then becomes hard to read even for the people who wrote it originally. Perhaps the future will tell me if this proves to be true.
+
+Also, back to functional composition: It's general idea reminds me of the UNIX philosophy, so perhaps it's old yet still shining light can help us understand newer stuff a bit better. Precisely speaking, functional programming does remind me of [these tenets](https://en.wikipedia.org/wiki/Unix_philosophy#Origin): 
+
+* Make each program do one thing well. To do a new job, build afresh rather than complicate old programs by adding new "features".
+  * *Instead of programs (assuming an imperative style), in functional programming we'd think in terms of simple functions. "Don't complicate old programs by adding new features" would be sort of equivalent to "avoid side effects"*. 
+
+* Expect the output of every program to become the input to another, as yet unknown, program. Don't clutter output with extraneous information. Avoid stringently columnar or binary input formats. Don't insist on interactive input.
+
+  * *This sorts of reminds me of Haskell and functional programming's desire to chain functions while keeping side effects to a minimum.*
+
+* Design and build software, even operating systems, to be tried early, ideally within weeks. Don't hesitate to throw away the clumsy parts and rebuild them.
+
+  * *Getting the types right when coding something new would be a part of the design process in Haskell, or in other languages like OCaml.*
+
+* Use tools in preference to unskilled help to lighten a programming task, even if you have to detour to build the tools and expect to throw some of them out after you've finished using them.
+
+  * *The tool here would be the type system itself, which is often touted to lighten programming tasks rather than making them harder... **after** you've spent a while understanding it.*
+
+Curiously enough, the comparisons between functional programming and the UNIX philosophy become harder to see the more the latter is "simplified" from what was said in the  Bell System Technical Journal from 1978, so we will refer to it rather than the following interpretations.
 
 Reading type signatures
 -----------------------
 
-TODO: Put everything related to how to read type signatures here.
+Understanding Haskell starts with understanding type signatures, and doing that felt difficult for me right from start because Haskell does type signatures in a way that's very different from more popular and imperative languages. In addition to that, the lack of narrative documentation I crashed over and over against when looking for how to use library-dependent examples seems to stem from an attitude that's common amongst haskellers: They expect you to look at the types and understand everything from looking at them, and thus refuse or balk at using "tenous words" to explain their code to others. Also, from hitting my head against it repeatedly I can report back and confirm that trying to learn Haskell through copy and paste, unlike other programming languages, is very much an impossible endeavor. You've really got to understand the principles before trying anything meaningful, and the principles mostly start with type signatures.
+
+In order to learn to read type signatures, let's first take a look at the hypothetical type signature of a function intended to check if a number is a prime number:
+
+```haskell
+isPrime :: Int -> Bool
+```
+
+The previous type signature is made of the following elements: 
+
+* `isPrime`, the name of the function.
+* `::`, which roughly means "what follows is the type signature of the thing with that name".
+*  `Int -> Bool`, which is the actual type signature, that indicates that there's an `Int` parameter and a `Bool` output.
+
+So `isPrime` would take an `Int` and return a `Bool` value. Up to here things seem relatively normal, at least for someone coming from imperative languages. Despite showing itself a little in `isPrime`, however, a certain characteristic of Haskell's type signatures doesn't come into full, clear view until we have a function that uses at least two input parameters. Let's look at the type signature of a function that would add two ints and return another one:
+
+```haskell
+myCustomAddition :: Int -> Int -> Int
+```
+
+In `myCustomAddition`'s signature the first two `Int`'s are input parameters, while the last `Int` is the returned type. That is, there is no additional syntax indicating that the last type is the output type, they form a chain as equals and we interpret it like described. This pattern also extends to functions with more parameters than two, no matter how many they are. This linear, chain-like style of depicting type signatures takes a while to become natural. There is a well-reasoned argumento to why Haskell is like this: This makes function composition easier, but that detail is out of scope for the time being, so let's take Haskell as it is for now. 
+
+One of the benefits of this kind of type signature is that the type signature of function that is received as a parameter (a first class function) is also fully detailed in the signature of the function that will use it. To explain this in more detail I'll assume that you've used the `map` function in another language before, like Python or Javascript. If you haven't used it, please look for how to do it with the programming language you have more experience with and then come back.
+
+So now we're going to take a look at the type signature of the `map` function in Haskell:
+
+```haskell
+map :: (a -> b) -> [a] -> [b]
+```
+
+> Tip: You can see the type signature of a function or any value in Haskell by going into the `ghci` interpreter and doing `:t something`, It will output the type signature of `something`.
+
+There's three new things in the `map` function signature: Abstract types, functions and lists, so let's check each one in turn:
+
+* `a` and `b` are abstract types wherever they happen, so they could be *any type at all*. That is, the `map` function doesn't really care what type they are, it just ensures that they remain the same..
+* `(a -> b)` indicates that the first parameter would be a function that transforms type `a` into type `b`. If it is between parentheses like this then it is a first-class function that is being passed around. This function could be, for example, our previous `isPrime` function, which would transform a number list into a boolean list as it is passed to `map`.
+* The second element of the signature, `[a]`, indicates that the second input parameter to `map` is a list of `a`'s.
+* The third, last and thus the returned type indicates that the output of `map` will be a list of `b`'s.
+
+We're mostly done now, but there's also one thing that's missing and that we will need to understand some type signatures, so let's illustrate it with another example: In addition to the `map` function in Haskell there's also a `fmap` function that works with lists as well as other data structures. If you're wondering why there are two versions of the same function, that's something we'll detail later. For now, let's look at `fmap`:
+
+```haskell
+fmap :: Functor f => (a -> b) -> f a -> f b
+```
+
+`fmap` introduces three aditional things to us: `Functor`, the `=>` arrow (which is different than the `->` arrow), and types `f a` and `f b` that contain two things separated with a space, which we hadn't seen before.
+
+In turn:
+
+* `Functor` is a typeclass, which is roughly equivalent (take this with several grains of salt, though!) to an interface or abstract class in other programming languages. That is, `fmap` ensures that `f` should be a `Functor` in order to work, and it also tells us that `fmap` would complain with an error if something that is not a `Functor` is being passed to it as `f`.
+
+* The `=>` arrow serves to delimit a "context" or type constraint area. That is, the stuff at the left of `=>` are constraints on types, and the stuff at the right of `=>` is the actual type signature.
+
+* Regarding `f a` and `f b` ... TODO.
+
+That'd be all for the type signature crash course. While I probably didn't cover everything there is to Haskell's type signatures, this will suffice for us to know what's happening in the following sections.
 
 Preamble to Functors
 --------------------
@@ -128,7 +197,13 @@ TODO
 Monads
 ------
 
-TODO
+TODO.
+
+> You can see the type signature of a function or any value by going into the `ghci` interpreter, typing `import System.Environment` into in and then doing `:t getArgs`, for example. It will output the type signature. It will error on `>>=` without parentheses, though. You have to type `:t (>>=)` for it to work.
+
+On a chat I was told that:
+
+> `>>=` can be understood as building on `<$>`, aka `fmap :: Functor f => (a -> b) -> f a -> fb`, which you should really understand before attempting to learn about monads.
 
 The dollar operator
 --------------------
@@ -245,8 +320,6 @@ there. I'm doing a **necessary detour** from `>>=` right now because I need to l
 * `getArgs :: IO [String]`
 * `getProgName :: IO String`
 * `getEnvironment :: IO [(String, String)]`
-
-> You can see the type signature of a function by going into the `ghci` interpreter, typing `import System.Environment` into in and then doing `:t getArgs`, for example. It will output the type signature. It will error on `>>=` without parentheses, though. You have to type `:t (>>=)` for it to work.
 
 So, the last three get functions receive no parameters and return a monad that "wraps" a list of strings, a string or a list of tuples, all three of which coming from the "dirty & impure" IO world of the devices, operative system and meatbag operator (yours truly!) of the computer that is running beautiful, pure and squeaky-clean Haskell. I am, however, missing a key piece of knowledge here: The `=>` operator is different 
 than `->` and it's being used all over the place. I already sort of grasp long chains that use `->` (where the last
